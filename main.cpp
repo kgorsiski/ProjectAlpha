@@ -22,6 +22,9 @@ int num_stat_runs = 30;
 double alph;
 double eps;
 
+void act();
+void react();
+
 
 
 class slotmachine{
@@ -37,11 +40,14 @@ public:
     int state;
     double average_earnings = 0;
     double previous_average = 0;
+
     
     int epsilon_greedy_action();
     int random_action();
     int greedy_action();
 };
+
+
 
 class adaptive_system{
 public:
@@ -54,10 +60,10 @@ public:
     
     
     
-    void sense();
+    void sense(vector<slotmachine>* pslot,vector<agent>* pagent, int num_machines);
     void decide();
-    void act();
-    void react();
+    void act(vector<slotmachine>* pslot,int input);
+    void react(vector<agent>* pagent, vector<slotmachine>* pslot, int input, double alph);
     
     void init();
     void stat_run();
@@ -100,7 +106,7 @@ int userinput(){
 
 
 
-void sense(vector<slotmachine>* pslot,vector<agent>* pagent, int num_machines ){
+void adaptive_system::sense(vector<slotmachine>* pslot,vector<agent>* pagent, int num_machines ){
     
     for(int index = 0; index < num_machines; index++){
         cout << "Slot Machine: " << index << "Has mu: " << pslot->at(index).mu << endl;
@@ -108,7 +114,7 @@ void sense(vector<slotmachine>* pslot,vector<agent>* pagent, int num_machines ){
     }
 }
 
-void decide(){
+void adaptive_system::decide(){
     int action;
     for(int index = 0; index < num_stat_runs; index++){
         double a = (double)rand()/RAND_MAX;
@@ -125,6 +131,7 @@ void act(vector<slotmachine>* pslot,int input){
     pslot->at(input).earnings = generateGaussianNoise(pslot->at(input).mu, pslot->at(input).sigma);
     return;
 }
+
 
 void react(vector<agent>* pagent, vector<slotmachine>* pslot, int input, double alph ){
     
@@ -205,7 +212,7 @@ void Fxn_A(double alph){
     
     vector<slotmachine>* pslot;
     vector<agent>*  pagent;
-    ::init(pslot,pagent,num_machines);
+    init(pslot,pagent,num_machines);
     
     int mu = 10;
     int sigma = 1;
@@ -249,7 +256,8 @@ void Fxn_B(double eps){
         act(pslot, input);
         pslot->at(input).counter ++;
         }
-    assert(pslot->at(0).counter > pslot->at(1).counter);
+    assert(pslot->at(3).counter > pslot->at(1).counter);
+    assert(pslot->at(3).counter > pslot->at(2).counter);
     
     cout << "Test B Successful" << endl;
     
@@ -267,14 +275,14 @@ int main() {
     Fxn_B(eps);
 
     
-    
+    /*
     int num_stat_runs = 30;
     
     for(int i=0; i<num_stat_runs; i++){
         stat_run(alph , eps);
     }
     
-    
+    */
     cout << "Program End\n";
     
     return 0;
